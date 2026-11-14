@@ -1,0 +1,5 @@
+Kestrel-9 Asteroid Mission
+
+Kestrel-9 is a fictional robotic probe launched on 14 March 2031 toward the asteroid Veldora-12. The probe weighs 612 kilograms and was built by the Meridian Space Consortium. It carries three instruments: a spectrometer called Prism, a sampling drill called Gimlet, and a wide-angle camera called Argus.
+
+The journey takes just over three years. Kestrel-9 arrived at Veldora-12 on 2 June 2034 and entered orbit at an altitude of 18 kilometres. On day 212 of the mission, contact with Earth was lost for 9 days because the main antenna jammed; the team recovered the link through the backup low-gain antenna. The mission director is Dr. Ananya Rao. Gimlet collected 41 grams of surface material in its first sampling attempt.

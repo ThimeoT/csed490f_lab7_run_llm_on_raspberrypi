@@ -77,6 +77,7 @@
     <header>
         <h1>LLM on Raspberry Pi</h1>
         <button id="new" type="button">New chat</button>
+        <label><input type="checkbox" id="rag" checked> RAG</label>
     </header>
     <div id="log"></div>
     <form id="form">
@@ -106,7 +107,8 @@
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({message: text, session_id: sessionId, stream: true}),
+                body: JSON.stringify({ message: text, session_id: sessionId, stream: true,
+                       use_rag: document.getElementById("rag").checked }),
             });
             if (!res.ok) {bot.textContent = `[HTTP ${res.status}] ` + await res.text(); return;}
 
@@ -132,8 +134,13 @@
             else if (ev.type === "error") bot.textContent += "\n[error] " + ev.detail;
             else if (ev.type === "done") {
                 const s = ev.stats || {};
-                const st = add("stats", `TTFT ${s.ttft_ms ?? "?"} ms · ${s.tokens_per_s ?? "?"} tok/s · total ${s.total_ms ?? "?"} ms`);
+                const st = add("stats", `TTFT ${s.ttft_ms ?? "?"} ms | ${s.tokens_per_s ?? "?"} tok/s | total ${s.total_ms ?? "?"} ms | retrieval ${s.retrieval_ms ?? "-"} ms`);
                 log.scrollTop = log.scrollHeight;
+            }
+            else if (ev.type === "sources") {
+                add("stats", ev.sources.length
+                    ? "Sources: " + ev.sources.map(s => `[${s.id}] ${s.source} (${s.score})`).join(" · ")
+                    : "No relevant source found");
             }
         }
 

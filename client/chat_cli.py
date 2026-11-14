@@ -13,6 +13,7 @@ def fmt(v, spec=".0f"):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--url", default="http://localhost:8000")
+    p.add_argument("--no-rag", action="store_true", help="disable RAG (Project 1 behaviour)")
     args = p.parse_args()
 
     sid = None
@@ -33,7 +34,8 @@ def main():
             print("[new conversation]")
             continue
 
-        body = {"message": text, "session_id": sid, "stream": True}
+        body = {"message": text, "session_id": sid, "stream": True,
+                "use_rag": False if args.no_rag else None}
         with requests.post(f"{args.url}/api/chat", json=body, stream=True, timeout=300) as r:
             if r.status_code != 200:
                 print(f"[HTTP {r.status_code}] {r.text}")
@@ -51,7 +53,14 @@ def main():
                 elif ev["type"] == "done":
                     s = ev["stats"]
                     print(f"\n[ttft {fmt(s.get('ttft_ms'))} ms | "
-                          f"{fmt(s.get('tokens_per_s'), '.1f')} tok/s]")
+                          f"{fmt(s.get('tokens_per_s'), '.1f')} tok/s | "
+                          f"retrieval {fmt(s.get('retrieval_ms'), '.1f')} ms]")
+                elif ev["type"] == "sources":
+                    if ev["sources"]:
+                        print("[sources] " + " | ".join(
+                            f"[{s['id']}] {s['source']} ({s['score']})" for s in ev["sources"]))
+                    else:
+                        print("[no relevant source found]")
 
 
 if __name__ == "__main__":
