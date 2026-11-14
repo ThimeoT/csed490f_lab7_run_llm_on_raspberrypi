@@ -26,3 +26,5 @@ python client/chat_cli.py --url http://<pi-ip>:8000
 python client/benchmark.py --url http://<pi-ip>:8000 -n 10 -c 1
 python client/benchmark.py --url http://<pi-ip>:8000 -n 10 -c 3   # load test
 ```
+
+In a web browser `http://<pi-ip>:8000/` opens the chat and `http://<pi-ip>:8000/docs` the Swagger doc 
