@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pi Chat</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            box-sizing: border-box;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        #log {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #8884;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .msg {
+            margin: 8px 0;
+            white-space: pre-wrap;
+        }
+
+        .user {
+            font-weight: 600;
+        }
+
+        .stats {
+            font-size: 12px;
+            opacity: .6;
+        }
+
+        form {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 16px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>LLM on Raspberry Pi</h1>
+        <button id="new" type="button">New chat</button>
+    </header>
+    <div id="log"></div>
+    <form id="form">
+        <input id="input" autocomplete="off" placeholder="Ask something..." autofocus>
+        <button id="send">Send</button>
+    </form>
+
+    <script>
+        const log = document.getElementById("log");
+        const form = document.getElementById("form");
+        const input = document.getElementById("input");
+        const sendBtn = document.getElementById("send");
+        let sessionId = null;
+
+        function add(cls, text) {
+            const d = document.createElement("div");
+            d.className = "msg " + cls;
+            d.textContent = text;
+            log.appendChild(d);
+            log.scrollTop = log.scrollHeight;
+            return d;
+        }
+
+        async function send(text) {
+            add("user", "You: " + text);
+            const bot = add("bot", "");
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({message: text, session_id: sessionId, stream: true}),
+            });
+            if (!res.ok) {bot.textContent = `[HTTP ${res.status}] ` + await res.text(); return;}
+
+            const reader = res.body.getReader();
+            const dec = new TextDecoder();
+            let buf = "";
+            while (true) {
+                const {value, done} = await reader.read();
+                if (done) break;
+                buf += dec.decode(value, {stream: true});
+                let i;
+                while ((i = buf.indexOf("\n")) >= 0) {
+                    const line = buf.slice(0, i).trim();
+                    buf = buf.slice(i + 1);
+                    if (line) handle(JSON.parse(line), bot);
+                }
+            }
+        }
+
+        function handle(ev, bot) {
+            if (ev.type === "meta") sessionId = ev.session_id;
+            else if (ev.type === "token") {bot.textContent += ev.content; log.scrollTop = log.scrollHeight;}
+            else if (ev.type === "error") bot.textContent += "\n[error] " + ev.detail;
+            else if (ev.type === "done") {
+                const s = ev.stats || {};
+                const st = add("stats", `TTFT ${s.ttft_ms ?? "?"} ms · ${s.tokens_per_s ?? "?"} tok/s · total ${s.total_ms ?? "?"} ms`);
+                log.scrollTop = log.scrollHeight;
+            }
+        }
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = "";
+            sendBtn.disabled = true;
+            try {await send(text);}
+            catch (err) {add("bot", "[network error] " + err);}
+            finally {sendBtn.disabled = false; input.focus();}
+        });
+
+        document.getElementById("new").addEventListener("click", async () => {
+            if (sessionId) {try {await fetch("/api/sessions/" + sessionId, {method: "DELETE"});} catch { } }
+            sessionId = null;
+            log.innerHTML = "";
+        });
+    </script>
+</body>
+
+</html>
