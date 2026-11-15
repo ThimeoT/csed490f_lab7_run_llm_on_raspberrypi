@@ -2,12 +2,12 @@
   {"q": "How tall is the Skerrvik lighthouse and how many steps lead to the top?", "expected_source": "lighthouse.txt", "answer": "42 m, 211 steps"},
   {"q": "Who looks after the lighthouse and what is her cat called?", "expected_source": "lighthouse.txt", "answer": "Maren Aldous; the cat is Pilchard"},
   {"q": "How often does the supply boat come to the island?", "expected_source": "lighthouse.txt", "answer": "Every second Thursday (the Gannet)"},
-  {"q": "At what temperature is the water used to feed the rhubarb starter?", "expected_source": "bakery.txt", "answer": "38 degrees Celsius"},
-  {"q": "On which day of the week is the Reykjavik bakery closed?", "expected_source": "bakery.txt", "answer": "Monday"},
+  {"q": "At what temperature is the water used to feed the rhubarb starter?", "expected_source": "backery.txt", "answer": "38 degrees Celsius"},
+  {"q": "On which day of the week is the Reykjavik bakery closed?", "expected_source": "backery.txt", "answer": "Monday"},
   {"q": "Which scientific instruments are on board the Kestrel-9 probe?", "expected_source": "kestrel.txt", "answer": "Prism (spectrometer), Gimlet (drill), Argus (camera)"},
   {"q": "Why did the probe lose contact with Earth and for how long?", "expected_source": "kestrel.txt", "answer": "The main antenna jammed; 9 days"},
-  {"q": "When and where does the chess club meet?", "expected_source": "chess_club.txt", "answer": "Tuesdays at 19:00, Dunmere public library, room 4"},
-  {"q": "Who won the 2025 Pawn Storm Cup?", "expected_source": "chess_club.txt", "answer": "Leila Haddad"},
+  {"q": "When and where does the chess club meet?", "expected_source": "cheese_club.txt", "answer": "Tuesdays at 19:00, Dunmere public library, room 4"},
+  {"q": "Who won the 2025 Pawn Storm Cup?", "expected_source": "cheese_club.txt", "answer": "Leila Haddad"},
   {"q": "What is the capital of Australia?", "expected_source": null, "answer": "Out of scope: should be rejected"},
   {"q": "How many goals did the Dunmere football team score last season?", "expected_source": null, "answer": "Out of scope (but same town as the chess club): should be rejected"}
 ]

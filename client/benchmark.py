@@ -21,7 +21,7 @@ def one(url: str, prompt: str) -> dict:
     t0 = time.perf_counter()
     ttft, stats = None, {}
     # No session_id : each request is an independant conversation
-    with requests.post(f"{url}/api/chat", json={"message": prompt, "stream": True},
+    with requests.post(f"{url}/api/chat", json={"message": prompt, "stream": True, "use_rag": False},
                        stream=True, timeout=600) as r:
         if r.status_code != 200:
             return {"ok": False, "why": f"HTTP {r.status_code}"}
